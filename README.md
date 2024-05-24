@@ -8,9 +8,9 @@
 ## Configuración del Proyecto
 Para configurar el proyecto en tu entorno local, sigue los siguientes pasos:
 
-1. Clona el repositorio en tu máquina local.
+## 1. Clona el repositorio en tu máquina local.
 
-2. Instala las dependencias del proyecto con el siguiente comando:
+## 2. Instala las dependencias del proyecto con el siguiente comando:
 ```
 npm install
 ```
@@ -36,9 +36,9 @@ npm run lint
 ### Personalización de la Configuración
 Para personalizar la configuración del proyecto, consulta la Referencia de Configuración de Vue.js.
 
-#### Contribuciones
+### Contribuciones
 Las contribuciones son bienvenidas. Por favor, abre un issue o realiza un pull request para sugerir cambios o mejoras.
 
-#### Licencia
+### Licencia
 2Type es un software de código abierto bajo la licencia MIT.
 See [Configuration Reference](https://cli.vuejs.org/config/).
