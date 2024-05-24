@@ -821,7 +821,7 @@ body.dark-mode input.search-input {
   }
 }
 
-@media (max-width: 600px) {
+@media (max-width: 700px) {
   /* Estilos específicos para celular */
   .navbar {
     flex-direction: column;
