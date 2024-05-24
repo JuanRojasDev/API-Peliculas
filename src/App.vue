@@ -1,6 +1,6 @@
 <template>
   <div id="app" :class="{ 'dark-mode': isDarkMode }">
-    <Home />
+    <Home @toggle-dark-mode="toggleDarkMode" :isDarkMode="isDarkMode" />
   </div>
 </template>
 
@@ -14,7 +14,7 @@ export default {
   },
   data() {
     return {
-      isDarkMode: false 
+      isDarkMode: false
     };
   },
   methods: {

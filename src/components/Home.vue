@@ -1,58 +1,90 @@
 <template>
-  <div id="app" :class="{ 'dark-mode': isDarkMode }">
+  <div :class="{ 'dark-mode': isDarkMode }">
     <nav class="navbar">
       <div class="navbar-left">
         <h1 class="logo">2 Type</h1>
       </div>
       <div class="navbar-right">
-        <button @click="onHomeButtonClick" class="nav-button">{{ translations[currentLanguage].home }}</button>
-        <div class="dropdown" @mouseover="showGenreOptions = true" @mouseleave="showGenreOptions = false">
-          <button class="nav-button dropdown-button">{{ translations[currentLanguage].genre }}</button>
+        <button @click="onHomeButtonClick" class="nav-button">
+          {{ translations[currentLanguage].home }}
+        </button>
+        <div
+          class="dropdown"
+          @mouseover="showGenreOptions = true"
+          @mouseleave="showGenreOptions = false"
+        >
+          <button class="nav-button dropdown-button">
+            {{ translations[currentLanguage].genre }}
+          </button>
           <div class="dropdown-content" v-show="showGenreOptions">
-            <a href="#" @click="filterByGenre('28')">{{ translations[currentLanguage].action }}</a>
-            <a href="#" @click="filterByGenre('12')">{{ translations[currentLanguage].adventure }}</a>
+            <a href="#" @click="filterByGenre(28)">{{
+              translations[currentLanguage].action
+            }}</a>
+            <a href="#" @click="filterByGenre(12)">{{
+              translations[currentLanguage].adventure
+            }}</a>
           </div>
         </div>
         <div class="dropdown">
-          <button class="nav-button dropdown-button">{{ translations[currentLanguage].language }}</button>
+          <button class="nav-button dropdown-button">
+            {{ translations[currentLanguage].language }}
+          </button>
           <div class="dropdown-content">
             <a href="#" @click="changeLanguage('en')">
-              <img src="https://upload.wikimedia.org/wikipedia/commons/a/a5/Flag_of_the_United_Kingdom_%281-2%29.svg"
-                alt="English">
+              <img
+                src="https://upload.wikimedia.org/wikipedia/commons/a/a5/Flag_of_the_United_Kingdom_%281-2%29.svg"
+                alt="English"
+              />
               {{ translations[currentLanguage].english }}
             </a>
             <a href="#" @click="changeLanguage('es')">
-              <img src="https://upload.wikimedia.org/wikipedia/commons/8/89/Bandera_de_Espa%C3%B1a.svg" alt="Español">
+              <img
+                src="https://upload.wikimedia.org/wikipedia/commons/8/89/Bandera_de_Espa%C3%B1a.svg"
+                alt="Español"
+              />
               {{ translations[currentLanguage].spanish }}
             </a>
           </div>
         </div>
-        <button @click="toggleDarkMode" class="mode-toggle">{{ isDarkMode ? '☀️' : '🌙' }}</button>
+        <button @click="toggleDarkMode" class="mode-toggle">
+          {{ isDarkMode ? "☀️" : "🌙" }}
+        </button>
       </div>
     </nav>
     <div class="search-filter-container">
       <div class="search-bar">
-        <input type="text" :placeholder="translations[currentLanguage].search" v-model="searchText"
-          class="search-input">
-        <button @click="filterMovies" class="search-button">{{ translations[currentLanguage].search }}</button>
+        <input
+          type="text"
+          :placeholder="translations[currentLanguage].search"
+          v-model="searchText"
+          class="search-input"
+        />
+        <button @click="filterMovies" class="search-button">
+          {{ translations[currentLanguage].search }}
+        </button>
       </div>
-      <button @click="toggleFilterOptions" class="filter-button">{{ translations[currentLanguage].filter }}</button>
+      <button @click="toggleFilterOptions" class="filter-button">
+        {{ translations[currentLanguage].filter }}
+      </button>
     </div>
     <div class="filter-section" v-if="showFilterOptions">
       <ul class="filter-list">
         <li>
           <label>
-            <input type="checkbox" v-model="selectedGenres" value="all"> {{ translations[currentLanguage].allGenres }}
+            <input type="checkbox" v-model="selectedGenres" value="all" />
+            {{ translations[currentLanguage].allGenres }}
           </label>
         </li>
         <li>
           <label>
-            <input type="checkbox" v-model="selectedGenres" value="28"> {{ translations[currentLanguage].action }}
+            <input type="checkbox" v-model="selectedGenres" value="28" />
+            {{ translations[currentLanguage].action }}
           </label>
         </li>
         <li>
           <label>
-            <input type="checkbox" v-model="selectedGenres" value="12"> {{ translations[currentLanguage].adventure }}
+            <input type="checkbox" v-model="selectedGenres" value="12" />
+            {{ translations[currentLanguage].adventure }}
           </label>
         </li>
       </ul>
@@ -60,95 +92,118 @@
     <div class="movie-container">
       <div class="movie-card" v-for="movie in filteredMovies" :key="movie.id">
         <div class="movie-card-header">
-          <button class="movie-card-language">{{ movie.original_language.toUpperCase() }}</button>
+          <button class="movie-card-language">
+            {{ movie.original_language.toUpperCase() }}
+          </button>
           <button class="movie-card-date">{{ movie.release_date }}</button>
         </div>
-        <img :src="`https://image.tmdb.org/t/p/original${movie.poster_path}`" alt="Movie Poster"
-          class="movie-card-image">
+        <img
+          :src="`https://image.tmdb.org/t/p/original${movie.poster_path}`"
+          alt="Movie Poster"
+          class="movie-card-image"
+        />
         <div class="movie-card-content">
           <h3 class="movie-card-title">{{ movie.title }}</h3>
-          <p class="movie-card-description">{{ movie.translated_overview || movie.overview }}</p>
+          <p class="movie-card-description">
+            {{ movie.translated_overview || movie.overview }}
+          </p>
           <div class="movie-card-info">
-            <span class="adult">{{ movie.adult ? translations[currentLanguage].adult : "" }}</span>
-            <span class="popularity">{{ translations[currentLanguage].popularity }}: {{ movie.popularity }}</span>
+            <span class="adult">{{
+              movie.adult ? translations[currentLanguage].adult : ""
+            }}</span>
+            <span class="popularity"
+              >{{ translations[currentLanguage].popularity }}:
+              {{ movie.popularity }}</span
+            >
           </div>
         </div>
       </div>
     </div>
     <!-- Footer aquí -->
     <footer class="footer">
-    <div class="footer-section">
-      <h2 class="logo-text">Juan Rojas</h2>
-      <p class="footer-description">Desarrollador de software con experiencia en desarrollo web y móvil.</p>
-    </div>
-    <div class="footer-section">
-      <h3 class="footer-heading">Contacto</h3>
-      <p class="footer-contact">Email: juan.rojas@example.com</p>
-      <p class="footer-contact">Teléfono: +1 234 567 890</p>
-    </div>
-    <div class="footer-section">
-      <h3 class="footer-heading">Redes sociales</h3>
-      <div class="socials">
-        <a href="https://github.com/your-github-username" target="_blank">
-          <i class="fab fa-github"></i>
-        </a>
-        <a href="https://linkedin.com/in/your-linkedin-username" target="_blank">
-          <i class="fab fa-linkedin"></i>
-        </a>
+      <div class="footer-left">
+        <h2 class="logo-text">Juan Rojas</h2>
+        <p class="footer-description">
+          Desarrollador de software con experiencia en desarrollo web y móvil.
+        </p>
+        <h3 class="footer-heading">Redes Sociales</h3>
+        <div class="socials">
+          <a href="https://github.com/JuanRojasDev" target="_blank">
+            <i class="fab fa-github"></i>
+          </a>
+          <a
+            href="https://www.linkedin.com/in/juan-andres-rojas-salinas-2a74b31bb/"
+            target="_blank"
+          >
+            <i class="fab fa-linkedin"></i>
+          </a>
+        </div>
       </div>
-    </div>
-  </footer>
+      <div class="footer-right">
+        <h3 class="footer-heading">Contacto</h3>
+        <p class="footer-contact">Email: juan.rojas@example.com</p>
+        <p class="footer-contact">Teléfono: +1 234 567 890</p>
+      </div>
+      <div class="footer-bottom">
+    <p>© 2024 2Type Peliculas Online, Todos los derechos reservados.</p>
+</div>
+    </footer>
     <!-- Fin del footer -->
   </div>
 </template>
 
-
 <script>
-import axios from 'axios';
+import axios from "axios";
 
 export default {
-  name: 'HomePage',
+  name: "HomePage",
+  props: {
+    isDarkMode: {
+      type: Boolean,
+      default: false,
+    },
+  },
   data() {
     return {
       movies: [],
-      apiUrl: 'https://api.themoviedb.org/3/movie/popular?api_key=0204da4c740bb5ffc6e709be0af7f05f',
-      searchText: '',
+      apiUrl:
+        "https://api.themoviedb.org/3/movie/popular?api_key=0204da4c740bb5ffc6e709be0af7f05f",
+      searchText: "",
       selectedGenres: [],
-      isDarkMode: false,
       showFilterOptions: false,
       showGenreOptions: false,
       genreToFilter: null,
-      currentLanguage: 'en',
+      currentLanguage: "en",
       translations: {
         en: {
-          home: 'Home',
-          genre: 'Genre',
-          action: 'Action',
-          adventure: 'Adventure',
-          language: 'Language',
-          english: 'English',
-          spanish: 'Spanish',
-          search: 'Search',
-          filter: 'Filter',
-          allGenres: 'All Genres',
-          popularity: 'Popularity',
-          adult: 'Adult',
+          home: "Home",
+          genre: "Genre",
+          action: "Action",
+          adventure: "Adventure",
+          language: "Language",
+          english: "English",
+          spanish: "Spanish",
+          search: "Search",
+          filter: "Filter",
+          allGenres: "All Genres",
+          popularity: "Popularity",
+          adult: "Adult",
         },
         es: {
-          home: 'Inicio',
-          genre: 'Género',
-          action: 'Acción',
-          adventure: 'Aventura',
-          language: 'Idioma',
-          english: 'Inglés',
-          spanish: 'Español',
-          search: 'Buscar',
-          filter: 'Filtrar',
-          allGenres: 'Todos los géneros',
-          popularity: 'Popularidad',
-          adult: 'Adulto',
-        }
-      }
+          home: "Inicio",
+          genre: "Género",
+          action: "Acción",
+          adventure: "Aventura",
+          language: "Idioma",
+          english: "Inglés",
+          spanish: "Español",
+          search: "Buscar",
+          filter: "Filtrar",
+          allGenres: "Todos los géneros",
+          popularity: "Popularidad",
+          adult: "Adulto",
+        },
+      },
     };
   },
   created() {
@@ -157,14 +212,13 @@ export default {
   methods: {
     async fetchMovies() {
       try {
-        const response = await fetch(this.apiUrl);
-        const data = await response.json();
-        this.movies = data.results;
-        if (this.currentLanguage === 'es') {
+        const response = await axios.get(this.apiUrl);
+        this.movies = response.data.results;
+        if (this.currentLanguage === "es") {
           this.translateOverviews();
         }
       } catch (error) {
-        console.error('Error fetching movies:', error);
+        console.error("Error fetching movies:", error);
       }
     },
     async translateOverviews() {
@@ -173,85 +227,88 @@ export default {
         const quoteUrl = `https://www.translated.net/hts/?f=quote&s=en-GB&t=es-419&w=${wordCount}&cid=htsdemo&p=htsdemo5&of=json`;
         try {
           const quoteResponse = await axios.get(quoteUrl);
-          console.log(`Translation quote for "${movie.title}":`, quoteResponse.data);
+          console.log(
+            `Translation quote for "${movie.title}":`,
+            quoteResponse.data
+          );
           movie.translation_cost = quoteResponse.data.price;
 
-          // Asumiendo que tienes una API de traducción
-          const translationUrl = `https://api.translation.com/translate?text=${encodeURIComponent(movie.overview)}&source=en&target=es`;
-          const translationResponse = await axios.post(translationUrl); // Cambiado de axios.get a axios.post
-          movie.overview = translationResponse.data.translatedText;
+          // Asumiendo que tienes una API para realizar la traducción
+          const translateUrl = `https://your-translation-api-url.com/translate?source=en&target=es&q=${encodeURIComponent(
+            movie.overview
+          )}`;
+          const translationResponse = await axios.get(translateUrl);
+          movie.translated_overview = translationResponse.data.translatedText;
         } catch (error) {
-          console.error('Error getting translation quote:', error);
+          console.error(
+            `Error translating overview for "${movie.title}":`,
+            error
+          );
         }
       }
     },
     countWords(text) {
-      if (!text) return 0;
-      return text.split(' ').filter(word => word.length > 0).length;
+      return text.split(/\s+/).length;
     },
     filterMovies() {
-      this.filteredMovies = this.movies.slice();
+      let filteredMovies = this.movies.slice();
+
+      // Filtrar por texto de búsqueda
       if (this.searchText) {
-        this.filteredMovies = this.filteredMovies.filter(
-          (movie) => movie.title.toLowerCase().includes(this.searchText.toLowerCase())
+        filteredMovies = filteredMovies.filter((movie) =>
+          movie.title.toLowerCase().includes(this.searchText.toLowerCase())
         );
       }
-      if (this.selectedGenres.length > 0 && !this.selectedGenres.includes('all')) {
-        this.filteredMovies = this.filteredMovies.filter((movie) =>
-          this.selectedGenres.some((genre) => movie.genre_ids.includes(parseInt(genre)))
+
+      // Filtrar por género seleccionado
+      if (
+        this.selectedGenres.length > 0 &&
+        !this.selectedGenres.includes("all")
+      ) {
+        filteredMovies = filteredMovies.filter((movie) =>
+          this.selectedGenres.some((genre) =>
+            movie.genre_ids.includes(Number(genre))
+          )
         );
       }
+
+      // Filtrar por género específico
       if (this.genreToFilter) {
-        this.filteredMovies = this.filteredMovies.filter((movie) =>
-          movie.genre_ids.includes(parseInt(this.genreToFilter))
+        filteredMovies = filteredMovies.filter((movie) =>
+          movie.genre_ids.includes(this.genreToFilter)
         );
       }
-    },
-    filterByGenre(genre) {
-      this.genreToFilter = genre;
-      this.filterMovies();
+
+      return filteredMovies;
     },
     onHomeButtonClick() {
-      window.location.reload();
+      this.genreToFilter = null;
+      this.selectedGenres = []; // Limpiamos la lista de géneros seleccionados
+      this.filteredMovies = this.filterMovies(); // Filtramos automáticamente las películas
     },
-    toggleDarkMode() {
-      this.isDarkMode = !this.isDarkMode;
+    filterByGenre(genreId) {
+      this.selectedGenres = []; // Limpiamos la lista de géneros seleccionados
+      this.genreToFilter = genreId; // Establecemos el género a filtrar
+      this.filteredMovies = this.filterMovies(); // Filtramos automáticamente las películas
+      this.showGenreOptions = false; // Cerramos el menú desplegable de géneros
     },
     toggleFilterOptions() {
       this.showFilterOptions = !this.showFilterOptions;
     },
     changeLanguage(language) {
       this.currentLanguage = language;
-      if (language === 'es') {
+      if (language === "es") {
         this.translateOverviews();
       }
     },
+    toggleDarkMode() {
+      this.$emit("toggle-dark-mode");
+    },
   },
   computed: {
-    appClass() {
-      return {
-        'dark-mode': this.isDarkMode,
-      };
-    },
     filteredMovies() {
-      let filteredMovies = this.movies.slice();
-      if (this.searchText) {
-        filteredMovies = filteredMovies.filter(
-          (movie) => movie.title.toLowerCase().includes(this.searchText.toLowerCase())
-        );
-      }
-      if (this.selectedGenres.length > 0 && !this.selectedGenres.includes('all')) {
-        filteredMovies = filteredMovies.filter((movie) =>
-          this.selectedGenres.some((genre) => movie.genre_ids.includes(parseInt(genre)))
-        );
-      }
-      if (this.genreToFilter) {
-        filteredMovies = filteredMovies.filter((movie) =>
-          movie.genre_ids.includes(parseInt(this.genreToFilter))
-        );
-      }
-      return filteredMovies;
-    }
+      return this.filterMovies();
+    },
   },
 };
 </script>
@@ -310,18 +367,17 @@ html {
   background-color: transparent;
   color: white;
   cursor: pointer;
-  font-size: 1.1em;
-  /* Aumenta el tamaño de la letra */
+  font-size: 1.1em; /* Aumenta el tamaño de la letra */
 }
 
 .dropdown-button::after {
-  content: '▼';
+  content: "▼";
   padding-left: 5px;
   font-size: 0.8em;
 }
 
 .dropdown-button:hover::after {
-  color: #007BFF;
+  color: #007bff;
 }
 
 .dropdown {
@@ -379,7 +435,6 @@ html {
   width: 350px;
   font-size: 1.2em;
   background-color: #d3d3d377;
-  /* Añade esta línea */
 }
 
 .search-button {
@@ -398,7 +453,7 @@ html {
   border: none;
   border-radius: 50px;
   margin-left: 10px;
-  background-color: #007BFF;
+  background-color: #007bff;
   color: white;
   cursor: pointer;
   font-size: 1em;
@@ -408,14 +463,10 @@ html {
   display: none;
   position: absolute;
   top: calc(100% + 10px);
-  /* Ajusta el espacio entre la barra de búsqueda y las opciones de filtro */
   left: 50%;
-  /* Centra horizontalmente */
   transform: translateX(-50%);
-  /* Centra horizontalmente */
-  border-radius: 50%;
+  border-radius: 50px;
   background-color: #f7f7f7;
-  /* Cambiado a un gris más claro */
   border: 1px solid #ccc;
   border-top: none;
 }
@@ -425,23 +476,18 @@ html {
   padding: 0;
   display: flex;
   justify-content: center;
-  /* Centra horizontalmente */
 }
 
 .filter-list li {
   margin: 0;
   font-size: 1.21em;
-  /* Aumenta el tamaño de la letra */
   cursor: pointer;
   padding: 15px;
-  /* Aumenta el espacio alrededor de las opciones */
   background-color: #f7f7f7;
-  /* Cambiado a un gris más claro */
 }
 
 .filter-list li:hover {
   background-color: #e3e3e3;
-  /* Ajusta el color de fondo al pasar el cursor */
 }
 
 .filter-list input[type="checkbox"] {
@@ -460,7 +506,7 @@ html {
   display: block;
   width: 9px;
   height: 9px;
-  background-color: #007BFF;
+  background-color: #007bff;
   border-radius: 50%;
   position: absolute;
   top: 3px;
@@ -495,7 +541,7 @@ html {
 
 .movie-card-language,
 .movie-card-date {
-  background-color: #007BFF;
+  background-color: #007bff;
   color: white;
   padding: 5px;
   border-radius: 3px;
@@ -527,7 +573,7 @@ html {
 }
 
 .movie-card-title:hover {
-  color: #007BFF;
+  color: #007bff;
 }
 
 .movie-card-description {
@@ -543,48 +589,60 @@ html {
 
 .footer {
   width: 100%;
-  background-color: black;
+  background-color: black;/* Un color de fondo más oscuro */
   color: #bdc3c7;
-  padding: 50px 0;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  padding: 30px 0;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
   display: flex;
-  flex-direction: column;
+  justify-content: space-between;
   align-items: center;
-  border-top: 3px solid #eee;
+  border-top: 3px solid #555; /* Un color de borde más oscuro */
 }
 
-.footer-section {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 20px;
+.footer-left,
+.footer-right {
+  flex: 1;
+  padding: 20px; /* Más espacio entre los elementos */
+  text-align: center;
 }
 
-.logo-text,
-.footer-heading {
-  font-size: 1.8em;
+.footer-left {
+  border-right: 1px solid #7f8c8d; /* Añadir una línea delgada a la derecha */
+  padding-right: 20px; /* Agregar espacio a la derecha de "Juan Rojas" */
+}
+
+.logo-text {
+  font-size: 1.5em; /* Tamaño de letra más grande */
   font-weight: bold;
-  margin-bottom: 10px;
+  margin-bottom: 5px;
   text-transform: uppercase;
-  letter-spacing: 2px;
+  letter-spacing: 2px; /* Más espacio entre las letras */
 }
 
-.footer-description,
+.footer-description {
+  margin-bottom: 20px; /* Más espacio debajo del texto */
+  font-size: 1em; /* Tamaño de letra más grande */
+}
+
+.footer-heading {
+  font-size: 1.3em; /* Tamaño de letra más grande */
+  font-weight: bold;
+}
+
 .footer-contact {
-  margin-bottom: 10px;
+  margin-bottom: 10px; /* Más espacio debajo del contacto */
 }
 
 .socials {
   display: flex;
-  justify-content: start;
+  justify-content: center;
   padding: 20px 0;
 }
 
 .socials a {
   color: #bdc3c7;
-  font-size: 1.5em;
-  margin-right: 15px;
+  font-size: 1.8em; /* Iconos más grandes */
+  margin-right: 20px; /* Más espacio entre los iconos */
   transition: color 0.3s ease;
 }
 
@@ -604,17 +662,22 @@ html {
 
 .contact-btn {
   width: 100%;
-  background-color: #007BFF; /* Cambia el color de fondo del botón a azul */
+  background-color: #007bff; /* Cambia el color de fondo del botón a azul */
   color: white; /* Cambia el color del texto del botón a blanco */
   border: none; /* Elimina el borde del botón */
   border-radius: 5px; /* Añade bordes redondeados al botón */
 }
 
 .footer-bottom {
-  margin-top: 20px; /* Agrega espacio entre el contenido del pie de página y el borde inferior */
-  border-top: 1px solid #666; /* Agrega una línea divisoria en la parte superior del pie de página */
-  padding-top: 10px; /* Añade espacio entre la línea divisoria y el texto inferior */
-  text-align: center; /* Centra el texto en la parte inferior */
+    margin-top: 20px; /* Agrega espacio entre el contenido del pie de página y el borde inferior */
+    border-top: 1px solid #666; /* Agrega una línea divisoria en la parte superior del pie de página */
+    padding-top: 10px; /* Añade espacio entre la línea divisoria y el texto inferior */
+    text-align: center; /* Centra el texto en la parte inferior */
+    font-size: 0.9em; /* Tamaño de letra para el texto inferior */
+    color: #ccc; /* Color de texto para el texto inferior */
+    position: fixed; /* Fija la posición del elemento */
+    bottom: 0; /* Lo coloca en la parte inferior de la ventana del navegador */
+    width: 100%; /* Ajusta el ancho para ocupar toda la pantalla */
 }
 
 /* Estilos del modo oscuro */
@@ -637,8 +700,8 @@ body.dark-mode input.search-input {
   justify-content: space-between;
   align-items: center;
   padding: 20px;
-  background-color: black; /* Color de fondo de la barra de navegación en modo oscuro */
-  color: white; /* Color del texto en modo oscuro */
+  background-color: black;
+  color: white;
 }
 
 .dark-mode .nav-button,
@@ -649,11 +712,21 @@ body.dark-mode input.search-input {
   background-color: transparent;
   color: white;
   cursor: pointer;
-  font-size: 1.1em;
+  font-size: 1.1em; /* Aumenta el tamaño de la letra */
+}
+
+.dark-mode .movie-card-language,
+.dark-mode .movie-card-date {
+  background-color: #333;
+  color: white;
+  padding: 5px;
+  border-radius: 3px;
+  border: none;
+  font-size: 0.8em;
 }
 
 .dark-mode .filter-button {
-  background-color: #007BFF; /* Cambia el color de fondo del botón de filtro a azul */
+  background-color: #007bff; /* Cambia el color de fondo del botón de filtro a azul */
   color: #eee; /* Cambia el color del texto de los botones a un tono claro */
 }
 
@@ -669,11 +742,6 @@ body.dark-mode input.search-input {
 }
 
 .dark-mode .search-input {
-  padding: 10px;
-  border: none;
-  border-radius: 50px;
-  width: 350px;
-  font-size: 1.2em;
   background-color: #d3d3d377; /* Color de fondo del input en modo oscuro */
   color: white; /* Color del texto en modo oscuro */
 }
@@ -688,8 +756,6 @@ body.dark-mode input.search-input {
   color: #eee; /* Cambia el color del texto de los botones a un tono claro */
   border: none;
   border-radius: 50px;
-  margin-left: 10px;
-  background-color: #333;
   cursor: pointer;
   font-size: 1em;
 }
@@ -700,7 +766,7 @@ body.dark-mode input.search-input {
 }
 
 .dark-mode .filter-list li {
-  background-color: #333; /* Cambia el color de fondo de los elementos de la lista a un tono oscuro */
+  background-color: #444; /* Cambia el color de fondo de los elementos de la lista a un tono oscuro */
   color: #eee; /* Cambia el color del texto a un tono claro */
 }
 
@@ -717,7 +783,6 @@ body.dark-mode input.search-input {
 }
 
 @media (min-width: 600px) and (max-width: 900px) {
-
   /* Estilos específicos para tablet */
   .navbar {
     flex-direction: column;
@@ -745,7 +810,7 @@ body.dark-mode input.search-input {
   .movie-card {
     width: 45%;
   }
-  
+
   .footer {
     flex-direction: row;
     justify-content: space-around;
@@ -757,7 +822,6 @@ body.dark-mode input.search-input {
 }
 
 @media (max-width: 600px) {
-
   /* Estilos específicos para celular */
   .navbar {
     flex-direction: column;
@@ -787,12 +851,46 @@ body.dark-mode input.search-input {
   }
 
   .footer {
-    flex-direction: row;
-    justify-content: space-around;
+    flex-direction: column;
+    text-align: center; /* Centra el contenido en dispositivos móviles */
   }
 
-  .footer-section {
-    align-items: flex-start;
+  .footer-left,
+  .footer-right {
+    border-right: none; /* Elimina el borde derecho en dispositivos móviles */
+    padding-right: 0; /* Elimina el espacio derecho en dispositivos móviles */
+  }
+
+  .footer-contact {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 20px; /* Ajusta el espacio entre la sección de contacto y el siguiente elemento */
+  }
+
+  .footer-bottom {
+    margin-top: 20px; /* Agrega espacio entre el contenido del pie de página y el borde inferior */
+    border-top: 1px solid #666; /* Agrega una línea divisoria en la parte superior del pie de página */
+    padding-top: 10px; /* Añade espacio entre la línea divisoria y el texto inferior */
+    text-align: center; /* Centra el texto en la parte inferior */
+    font-size: 0.9em; /* Tamaño de letra para el texto inferior */
+    color: #ccc; /* Color de texto para el texto inferior */
+    position: relative; /* Ajusta la posición para evitar superposiciones */
+  }
+
+  .socials {
+    margin-bottom: 20px; /* Ajusta el espacio entre los iconos y la línea divisoria */
+    position: relative; /* Permite posicionar la línea de forma relativa a este contenedor */
+  }
+
+  .socials:after {
+    content: "";
+    position: absolute; /* Permite posicionar la línea de forma absoluta dentro de .socials */
+    bottom: -10px; /* Ubica la línea 10px debajo de .socials */
+    left: 0; /* Ajusta la posición inicial de la línea */
+    width: 100%; /* Ajusta la anchura de la línea al 100% del contenedor */
+    border-bottom: 1px solid #ccc; /* Agrega la línea divisoria */
   }
 }
+
 </style>
