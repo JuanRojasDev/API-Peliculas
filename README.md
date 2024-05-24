@@ -8,9 +8,9 @@
 ## Configuración del Proyecto
 Para configurar el proyecto en tu entorno local, sigue los siguientes pasos:
 
-## 1. Clona el repositorio en tu máquina local.
+#### 1. Clona el repositorio en tu máquina local.
 
-## 2. Instala las dependencias del proyecto con el siguiente comando:
+#### 2. Instala las dependencias del proyecto con el siguiente comando:
 ```
 npm install
 ```
