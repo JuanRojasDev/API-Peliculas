@@ -8,8 +8,7 @@
         <button @click="onHomeButtonClick" class="nav-button">
           {{ translations[currentLanguage].home }}
         </button>
-        <div
-          class="dropdown"
+        <div class="dropdown"
           @mouseover="showGenreOptions = true"
           @mouseleave="showGenreOptions = false"
         >
@@ -17,12 +16,9 @@
             {{ translations[currentLanguage].genre }}
           </button>
           <div class="dropdown-content" v-show="showGenreOptions">
-            <a href="#" @click="filterByGenre(28)">{{
-              translations[currentLanguage].action
-            }}</a>
-            <a href="#" @click="filterByGenre(12)">{{
-              translations[currentLanguage].adventure
-            }}</a>
+            <a v-for="genre in genres" :key="genre.id" @click="filterByGenre(genre.id)">
+              {{ genre.name }}
+            </a>
           </div>
         </div>
         <div class="dropdown">
@@ -55,11 +51,12 @@
       <div class="search-bar">
         <input
           type="text"
-          :placeholder="translations[currentLanguage].search"
           v-model="searchText"
+          @input="filterAndSortMovies"
           class="search-input"
+          :placeholder="translations[currentLanguage].search"
         />
-        <button @click="filterMovies" class="search-button">
+        <button @click="filterAndSortMovies" class="search-button">
           {{ translations[currentLanguage].search }}
         </button>
       </div>
@@ -75,18 +72,11 @@
             {{ translations[currentLanguage].allGenres }}
           </label>
         </li>
-        <li>
-          <label>
-            <input type="checkbox" v-model="selectedGenres" value="28" />
-            {{ translations[currentLanguage].action }}
-          </label>
-        </li>
-        <li>
-          <label>
-            <input type="checkbox" v-model="selectedGenres" value="12" />
-            {{ translations[currentLanguage].adventure }}
-          </label>
-        </li>
+        <select v-model="selectedGenre">
+  <option v-for="genre in genres" :key="genre.id" :value="genre.id">
+    {{ genre.name }}
+  </option>
+</select>
       </ul>
     </div>
     <div class="movie-container">
@@ -145,8 +135,8 @@
         <p class="footer-contact">Teléfono: +1 234 567 890</p>
       </div>
       <div class="footer-bottom">
-    <p>© 2024 2Type Peliculas Online, Todos los derechos reservados.</p>
-</div>
+        <p>© 2024 2Type Peliculas Online, Todos los derechos reservados.</p>
+      </div>
     </footer>
     <!-- Fin del footer -->
   </div>
@@ -166,10 +156,12 @@ export default {
   data() {
     return {
       movies: [],
-      apiUrl:
-        "https://api.themoviedb.org/3/movie/popular?api_key=0204da4c740bb5ffc6e709be0af7f05f",
+      originalMovies: [],
+      apiUrl: "https://api.themoviedb.org/3/discover/movie",
+      apiKey: "0204da4c740bb5ffc6e709be0af7f05f",
       searchText: "",
-      selectedGenres: [],
+      selectedGenre: null,
+      genres: [],
       showFilterOptions: false,
       showGenreOptions: false,
       genreToFilter: null,
@@ -208,32 +200,70 @@ export default {
   },
   created() {
     this.fetchMovies();
+    this.fetchGenres();
+  },
+  watch: {
+    selectedGenre(newGenre) {
+      this.selectedGenres = [newGenre];
+    }
   },
   methods: {
     async fetchMovies() {
       try {
-        const response = await axios.get(this.apiUrl);
-        this.movies = response.data.results;
+        const totalPages = 500;
+        const requests = Array.from({ length: totalPages }, (_, i) =>
+          axios.get(this.apiUrl, {
+            params: {
+              api_key: this.apiKey,
+              page: i + 1,
+            },
+          })
+        );
+        const responses = await Promise.all(requests);
+        const allMovies = responses.flatMap(
+          (response) => response.data.results
+        );
         if (this.currentLanguage === "es") {
-          this.translateOverviews();
+          await this.translateOverviews(allMovies);
         }
+        this.originalMovies = allMovies;
+        let index = 0;
+        const intervalId = setInterval(() => {
+          const moviesToAdd = allMovies.slice(index, index + 3000);
+          this.movies.push(...moviesToAdd);
+          index += 3000;
+          if (index >= allMovies.length) {
+            clearInterval(intervalId);
+          }
+        }, 2000);
       } catch (error) {
         console.error("Error fetching movies:", error);
       }
     },
-    async translateOverviews() {
-      for (const movie of this.movies) {
+    async fetchGenres() {
+      try {
+        const response = await axios.get(
+          `https://api.themoviedb.org/3/genre/movie/list`,
+          {
+            params: {
+              api_key: this.apiKey,
+              language: this.currentLanguage,
+            },
+          }
+        );
+        this.genres = response.data.genres;
+      } catch (error) {
+        console.error("Error fetching genres:", error);
+      }
+    },
+    async translateOverviews(movies) {
+      for (const movie of movies) {
         const wordCount = this.countWords(movie.overview);
         const quoteUrl = `https://www.translated.net/hts/?f=quote&s=en-GB&t=es-419&w=${wordCount}&cid=htsdemo&p=htsdemo5&of=json`;
         try {
           const quoteResponse = await axios.get(quoteUrl);
-          console.log(
-            `Translation quote for "${movie.title}":`,
-            quoteResponse.data
-          );
           movie.translation_cost = quoteResponse.data.price;
 
-          // Asumiendo que tienes una API para realizar la traducción
           const translateUrl = `https://your-translation-api-url.com/translate?source=en&target=es&q=${encodeURIComponent(
             movie.overview
           )}`;
@@ -250,55 +280,61 @@ export default {
     countWords(text) {
       return text.split(/\s+/).length;
     },
-    filterMovies() {
-      let filteredMovies = this.movies.slice();
+    filterAndSortMovies() {
+  // Hacer una copia profunda de this.originalMovies
+  let filteredMovies = JSON.parse(JSON.stringify(this.originalMovies));
+  
+  // Filtrado por texto de búsqueda
+  if (this.searchText !== "") {
+    const searchTextLower = this.searchText.toLowerCase();
+    filteredMovies = filteredMovies.filter((movie) =>
+      movie.title.toLowerCase().includes(searchTextLower)
+    );
+  }
+  
+  // Filtrado por géneros seleccionados
+  if (this.selectedGenres.length > 0 && !this.selectedGenres.includes("all")) {
+    filteredMovies = filteredMovies.filter((movie) =>
+      movie.genre_ids &&
+      this.selectedGenres.some((genre) =>
+        movie.genre_ids.includes(Number(genre))
+      )
+    );
+  }
+  
+  // Ordenación por popularidad y título
+  filteredMovies.sort((a, b) => b.popularity - a.popularity);
+  filteredMovies.sort((a, b) => {
+    const titleA = a.title.toLowerCase();
+    const titleB = b.title.toLowerCase();
+    return titleA.localeCompare(titleB);
+  });
+  
+  this.movies = filteredMovies;
+},
 
-      // Filtrar por texto de búsqueda
-      if (this.searchText) {
-        filteredMovies = filteredMovies.filter((movie) =>
-          movie.title.toLowerCase().includes(this.searchText.toLowerCase())
-        );
-      }
+onHomeButtonClick() {
+  this.genreToFilter = null;
+  this.selectedGenres = [];
+  this.searchText = "";
+  this.filterAndSortMovies();
+},
 
-      // Filtrar por género seleccionado
-      if (
-        this.selectedGenres.length > 0 &&
-        !this.selectedGenres.includes("all")
-      ) {
-        filteredMovies = filteredMovies.filter((movie) =>
-          this.selectedGenres.some((genre) =>
-            movie.genre_ids.includes(Number(genre))
-          )
-        );
-      }
-
-      // Filtrar por género específico
-      if (this.genreToFilter) {
-        filteredMovies = filteredMovies.filter((movie) =>
-          movie.genre_ids.includes(this.genreToFilter)
-        );
-      }
-
-      return filteredMovies;
-    },
-    onHomeButtonClick() {
-      this.genreToFilter = null;
-      this.selectedGenres = []; // Limpiamos la lista de géneros seleccionados
-      this.filteredMovies = this.filterMovies(); // Filtramos automáticamente las películas
-    },
-    filterByGenre(genreId) {
-      this.selectedGenres = []; // Limpiamos la lista de géneros seleccionados
-      this.genreToFilter = genreId; // Establecemos el género a filtrar
-      this.filteredMovies = this.filterMovies(); // Filtramos automáticamente las películas
-      this.showGenreOptions = false; // Cerramos el menú desplegable de géneros
-    },
+filterByGenre(genreId) {
+  const genreNumber = Number(genreId);
+  this.selectedGenres = [genreNumber];
+  this.filterAndSortMovies();
+},
     toggleFilterOptions() {
       this.showFilterOptions = !this.showFilterOptions;
     },
     changeLanguage(language) {
       this.currentLanguage = language;
+      this.fetchGenres();
       if (language === "es") {
-        this.translateOverviews();
+        this.translateOverviews(this.movies).then(() => {
+          this.filterAndSortMovies();
+        });
       }
     },
     toggleDarkMode() {
@@ -307,8 +343,11 @@ export default {
   },
   computed: {
     filteredMovies() {
-      return this.filterMovies();
+      return this.movies;
     },
+  },
+  mounted() {
+    this.fetchMovies();
   },
 };
 </script>
@@ -589,7 +628,7 @@ html {
 
 .footer {
   width: 100%;
-  background-color: black;/* Un color de fondo más oscuro */
+  background-color: black; /* Un color de fondo más oscuro */
   color: #bdc3c7;
   padding: 30px 0;
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
@@ -651,7 +690,9 @@ html {
 }
 
 .contact-form {
-  width: calc(33% - 20px); /* Establece el ancho de la sección de formulario de contacto */
+  width: calc(
+    33% - 20px
+  ); /* Establece el ancho de la sección de formulario de contacto */
 }
 
 .contact-input {
@@ -669,15 +710,15 @@ html {
 }
 
 .footer-bottom {
-    margin-top: 20px; /* Agrega espacio entre el contenido del pie de página y el borde inferior */
-    border-top: 1px solid #666; /* Agrega una línea divisoria en la parte superior del pie de página */
-    padding-top: 10px; /* Añade espacio entre la línea divisoria y el texto inferior */
-    text-align: center; /* Centra el texto en la parte inferior */
-    font-size: 0.9em; /* Tamaño de letra para el texto inferior */
-    color: #ccc; /* Color de texto para el texto inferior */
-    position: fixed; /* Fija la posición del elemento */
-    bottom: 0; /* Lo coloca en la parte inferior de la ventana del navegador */
-    width: 100%; /* Ajusta el ancho para ocupar toda la pantalla */
+  margin-top: 20px; /* Agrega espacio entre el contenido del pie de página y el borde inferior */
+  border-top: 1px solid #666; /* Agrega una línea divisoria en la parte superior del pie de página */
+  padding-top: 10px; /* Añade espacio entre la línea divisoria y el texto inferior */
+  text-align: center; /* Centra el texto en la parte inferior */
+  font-size: 0.9em; /* Tamaño de letra para el texto inferior */
+  color: #ccc; /* Color de texto para el texto inferior */
+  position: fixed; /* Fija la posición del elemento */
+  bottom: 0; /* Lo coloca en la parte inferior de la ventana del navegador */
+  width: 100%; /* Ajusta el ancho para ocupar toda la pantalla */
 }
 
 /* Estilos del modo oscuro */
@@ -892,5 +933,4 @@ body.dark-mode input.search-input {
     border-bottom: 1px solid #ccc; /* Agrega la línea divisoria */
   }
 }
-
 </style>
