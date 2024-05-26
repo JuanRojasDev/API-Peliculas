@@ -981,8 +981,8 @@ body.dark-mode input.search-input {
   background-color: #eee; /* Cambia el color de fondo del checkbox marcado a azul */
 }
 
-@media (min-width: 600px) and (max-width: 900px) {
-  /* Estilos específicos para tablet */
+/* Estilos para móvil pequeño */
+@media (max-width: 360px) {
   .navbar {
     flex-direction: column;
   }
@@ -1007,21 +1007,126 @@ body.dark-mode input.search-input {
   }
 
   .movie-card {
-    width: 45%;
+    width: 90%;
   }
 
   .footer {
-    flex-direction: row;
-    justify-content: space-around;
+    flex-direction: column;
+    text-align: center; /* Centra el contenido en dispositivos móviles */
   }
 
-  .footer-section {
-    align-items: flex-start;
+  .footer-left,
+  .footer-right {
+    border-right: none; /* Elimina el borde derecho en dispositivos móviles */
+    padding-right: 0; /* Elimina el espacio derecho en dispositivos móviles */
+  }
+
+  .footer-contact {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 20px; /* Ajusta el espacio entre la sección de contacto y el siguiente elemento */
+  }
+
+  .footer-bottom {
+    margin-top: 20px; /* Agrega espacio entre el contenido del pie de página y el borde inferior */
+    border-top: 1px solid #666; /* Agrega una línea divisoria en la parte superior del pie de página */
+    padding-top: 10px; /* Añade espacio entre la línea divisoria y el texto inferior */
+    text-align: center; /* Centra el texto en la parte inferior */
+    font-size: 0.9em; /* Tamaño de letra para el texto inferior */
+    color: #ccc; /* Color de texto para el texto inferior */
+    position: relative; /* Ajusta la posición para evitar superposiciones */
+  }
+
+  .socials {
+    margin-bottom: 20px; /* Ajusta el espacio entre los iconos y la línea divisoria */
+    position: relative; /* Permite posicionar la línea de forma relativa a este contenedor */
+  }
+
+  .socials:after {
+    content: "";
+    position: absolute; /* Permite posicionar la línea de forma absoluta dentro de .socials */
+    bottom: -10px; /* Ubica la línea 10px debajo de .socials */
+    left: 0; /* Ajusta la posición inicial de la línea */
+    width: 100%; /* Ajusta la anchura de la línea al 100% del contenedor */
+    border-bottom: 1px solid #ccc; /* Agrega la línea divisoria */
   }
 }
 
-@media (max-width: 700px) {
-  /* Estilos específicos para celular */
+/* Estilos para móvil medio */
+@media (min-width: 361px) and (max-width: 375px) {
+  .navbar {
+    flex-direction: column;
+  }
+
+  .navbar-left,
+  .navbar-right {
+    width: 100%;
+    justify-content: space-around;
+    margin-bottom: 10px;
+  }
+
+  .search-filter-container {
+    flex-direction: column;
+  }
+
+  .search-bar {
+    margin-bottom: 20px;
+  }
+
+  .search-input {
+    width: 100%;
+  }
+
+  .movie-card {
+    width: 90%;
+  }
+
+  .footer {
+    flex-direction: column;
+    text-align: center; /* Centra el contenido en dispositivos móviles */
+  }
+
+  .footer-left,
+  .footer-right {
+    border-right: none; /* Elimina el borde derecho en dispositivos móviles */
+    padding-right: 0; /* Elimina el espacio derecho en dispositivos móviles */
+  }
+
+  .footer-contact {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 20px; /* Ajusta el espacio entre la sección de contacto y el siguiente elemento */
+  }
+
+  .footer-bottom {
+    margin-top: 20px; /* Agrega espacio entre el contenido del pie de página y el borde inferior */
+    border-top: 1px solid #666; /* Agrega una línea divisoria en la parte superior del pie de página */
+    padding-top: 10px; /* Añade espacio entre la línea divisoria y el texto inferior */
+    text-align: center; /* Centra el texto en la parte inferior */
+    font-size: 0.9em; /* Tamaño de letra para el texto inferior */
+    color: #ccc; /* Color de texto para el texto inferior */
+    position: relative; /* Ajusta la posición para evitar superposiciones */
+  }
+
+  .socials {
+    margin-bottom: 20px; /* Ajusta el espacio entre los iconos y la línea divisoria */
+    position: relative; /* Permite posicionar la línea de forma relativa a este contenedor */
+  }
+
+  .socials:after {
+    content: "";
+    position: absolute; /* Permite posicionar la línea de forma absoluta dentro de .socials */
+    bottom: -10px; /* Ubica la línea 10px debajo de .socials */
+    left: 0; /* Ajusta la posición inicial de la línea */
+    width: 100%; /* Ajusta la anchura de la línea al 100% del contenedor */
+    border-bottom: 1px solid #ccc; /* Agrega la línea divisoria */
+  }
+}
+
+/* Estilos para smartphone grande */
+@media (min-width: 376px) and (max-width: 720px) {
   .navbar {
     flex-direction: column;
   }
