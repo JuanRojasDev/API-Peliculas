@@ -8,12 +8,20 @@
         <button @click="onHomeButtonClick" class="nav-button">
           {{ translations[currentLanguage].home }}
         </button>
-        <div class="dropdown" @mouseover="showGenreOptions = true" @mouseleave="showGenreOptions = false">
+        <div
+          class="dropdown"
+          @mouseover="showGenreOptions = true"
+          @mouseleave="showGenreOptions = false"
+        >
           <button class="nav-button dropdown-button">
             {{ translations[currentLanguage].genre }}
           </button>
           <div class="dropdown-content" v-show="showGenreOptions">
-            <a v-for="genre in genres" :key="genre.id" @click="filterByGenre(genre.id)">
+            <a
+              v-for="genre in genres"
+              :key="genre.id"
+              @click="filterByGenre(genre.id)"
+            >
               {{ genre.name }}
             </a>
           </div>
@@ -24,11 +32,17 @@
           </button>
           <div class="dropdown-content">
             <a href="#" @click="changeLanguage('en')">
-              <img src="https://upload.wikimedia.org/wikipedia/commons/a/a5/Flag_of_the_United_Kingdom_%281-2%29.svg" alt="English" />
+              <img
+                src="https://upload.wikimedia.org/wikipedia/commons/a/a5/Flag_of_the_United_Kingdom_%281-2%29.svg"
+                alt="English"
+              />
               {{ translations[currentLanguage].english }}
             </a>
             <a href="#" @click="changeLanguage('es')">
-              <img src="https://upload.wikimedia.org/wikipedia/commons/8/89/Bandera_de_Espa%C3%B1a.svg" alt="Español" />
+              <img
+                src="https://upload.wikimedia.org/wikipedia/commons/8/89/Bandera_de_Espa%C3%B1a.svg"
+                alt="Español"
+              />
               {{ translations[currentLanguage].spanish }}
             </a>
           </div>
@@ -81,9 +95,15 @@
           </button>
           <button class="movie-card-date">{{ movie.release_date }}</button>
         </div>
-        <img :src="`https://image.tmdb.org/t/p/original${movie.poster_path}`" alt="Movie Poster" class="movie-card-image" />
+        <img
+          :src="`https://image.tmdb.org/t/p/original${movie.poster_path}`"
+          alt="Movie Poster"
+          class="movie-card-image"
+        />
         <div class="movie-card-content">
-          <h3 class="movie-card-title">{{ movie.title }}</h3>
+          <h3 class="movie-card-title">
+            {{ movie.translated_title || movie.title }}
+          </h3>
           <p class="movie-card-description">
             {{ movie.translated_overview || movie.overview }}
           </p>
@@ -92,23 +112,31 @@
               {{ movie.adult ? translations[currentLanguage].adult : "" }}
             </span>
             <span class="popularity">
-              {{ translations[currentLanguage].popularity }}: {{ movie.popularity }}
+              {{ translations[currentLanguage].popularity }}:
+              {{ movie.popularity }}
             </span>
           </div>
         </div>
       </div>
     </div>
     <div class="pagination">
-  <div>
-    <button @click="prevPage" :disabled="currentPage === 1">
-      <i class="fas fa-arrow-left">{{ translations[currentLanguage].prev }}</i> <!-- Flecha para anterior -->
-    </button>
-    <span>{{ currentPage }}</span>
-    <button @click="nextPage" :disabled="currentPage * itemsPerPage >= filteredMovies.length">
-      <i class="fas fa-arrow-right">{{ translations[currentLanguage].next }}</i> <!-- Flecha para siguiente -->
-    </button>
-  </div>
-</div>
+      <div>
+        <button @click="prevPage" :disabled="currentPage === 1">
+          <i class="fas fa-arrow-left">{{
+            translations[currentLanguage].prev
+          }}</i>
+        </button>
+        <span>{{ currentPage }}</span>
+        <button
+          @click="nextPage"
+          :disabled="currentPage * itemsPerPage >= filteredMovies.length"
+        >
+          <i class="fas fa-arrow-right">{{
+            translations[currentLanguage].next
+          }}</i>
+        </button>
+      </div>
+    </div>
     <footer class="footer">
       <div class="footer-left">
         <h2 class="logo-text">Juan Rojas</h2>
@@ -120,7 +148,10 @@
           <a href="https://github.com/JuanRojasDev" target="_blank">
             <i class="fab fa-github"></i>
           </a>
-          <a href="https://www.linkedin.com/in/juan-andres-rojas-salinas-2a74b31bb/" target="_blank">
+          <a
+            href="https://www.linkedin.com/in/juan-andres-rojas-salinas-2a74b31bb/"
+            target="_blank"
+          >
             <i class="fab fa-linkedin"></i>
           </a>
         </div>
@@ -222,9 +253,11 @@ export default {
           })
         );
         const responses = await Promise.all(requests);
-        const allMovies = responses.flatMap((response) => response.data.results);
+        const allMovies = responses.flatMap(
+          (response) => response.data.results
+        );
         if (this.currentLanguage === "es") {
-          await this.translateOverviews(allMovies);
+          await this.translateMovies(allMovies);
         }
         this.originalMovies = allMovies;
         this.movies = allMovies;
@@ -235,39 +268,121 @@ export default {
     },
     async fetchGenres() {
       try {
-        const response = await axios.get(`https://api.themoviedb.org/3/genre/movie/list`, {
-          params: {
-            api_key: this.apiKey,
-            language: this.currentLanguage,
-          },
-        });
+        const response = await axios.get(
+          `https://api.themoviedb.org/3/genre/movie/list`,
+          {
+            params: {
+              api_key: this.apiKey,
+              language: this.currentLanguage,
+            },
+          }
+        );
         this.genres = response.data.genres;
       } catch (error) {
         console.error("Error fetching genres:", error);
       }
     },
-    async translateOverviews(movies) {
-      for (const movie of movies) {
-        const wordCount = this.countWords(movie.overview);
-        if (wordCount <= 100) {
-          try {
-            const response = await axios.get(
-              `https://translation.googleapis.com/language/translate/v2`,
-              {
-                params: {
-                  q: movie.overview,
-                  target: "es",
-                  key: "YOUR_GOOGLE_TRANSLATE_API_KEY",
-                },
-              }
-            );
-            movie.translated_overview = response.data.data.translations[0].translatedText;
-          } catch (error) {
-            console.error("Error translating overview:", error);
-          }
-        }
-      }
+    async translateMovies(movies) {
+      const translatePromises = movies.map(async (movie) => {
+        await this.translateOverview(movie);
+        await this.translateTitle(movie);
+      });
+      await Promise.all(translatePromises);
     },
+    async translateOverview(movie) {
+  if (this.countWords(movie.overview) <= 100) {
+    const localStorageKey = `overview_translation_${movie.id}_${this.currentLanguage}`;
+    const storedTranslation = localStorage.getItem(localStorageKey);
+
+    if (storedTranslation) {
+      movie.translated_overview = storedTranslation;
+    } else {
+      try {
+        const response = await axios.get(
+          "https://translation.googleapis.com/language/translate/v2",
+          {
+            params: {
+              q: movie.overview,
+              source: "en",
+              target: "es",
+              key: "AIzaSyCqRYINJR0ON1xtGrwYN5IrfcsrJHBQkwI",
+            },
+          }
+        );
+        if (
+          response.data &&
+          response.data.data &&
+          response.data.data.translations &&
+          response.data.data.translations.length > 0
+        ) {
+          movie.translated_overview =
+            response.data.data.translations[0].translatedText;
+          // Guardar la traducción en el localStorage
+          localStorage.setItem(
+            localStorageKey,
+            movie.translated_overview
+          );
+        } else {
+          console.error(
+            "Translation response structure does not match expected format:",
+            response.data
+          );
+        }
+      } catch (error) {
+        console.error(
+          "Error translating overview:",
+          error.response ? error.response.data : error.message
+        );
+      }
+    }
+  }
+},
+async translateTitle(movie) {
+  const localStorageKey = `title_translation_${movie.id}_${this.currentLanguage}`;
+  const storedTranslation = localStorage.getItem(localStorageKey);
+
+  if (storedTranslation) {
+    movie.translated_title = storedTranslation;
+  } else {
+    try {
+      const response = await axios.get(
+        "https://translation.googleapis.com/language/translate/v2",
+        {
+          params: {
+            q: movie.title,
+            source: "en",
+            target: "es",
+            key: "AIzaSyCqRYINJR0ON1xtGrwYN5IrfcsrJHBQkwI",
+          },
+        }
+      );
+      if (
+        response.data &&
+        response.data.data &&
+        response.data.data.translations &&
+        response.data.data.translations.length > 0
+      ) {
+        movie.translated_title =
+          response.data.data.translations[0].translatedText;
+        // Guardar la traducción en el localStorage
+        localStorage.setItem(
+          localStorageKey,
+          movie.translated_title
+        );
+      } else {
+        console.error(
+          "Translation response structure does not match expected format:",
+          response.data
+        );
+      }
+    } catch (error) {
+      console.error(
+        "Error translating title:",
+        error.response ? error.response.data : error.message
+      );
+    }
+  }
+},
     countWords(text) {
       return text.split(/\s+/).length;
     },
@@ -304,7 +419,7 @@ export default {
       this.currentPage = 1;
     },
     nextPage() {
-      if (this.currentPage * this.itemsPerPage < this.movies.length) {
+      if (this.currentPage * this.itemsPerPage < this.filteredMovies.length) {
         this.currentPage++;
       }
     },
@@ -318,7 +433,9 @@ export default {
     filteredMovies() {
       let filtered = this.movies;
       if (this.selectedGenre && this.selectedGenre !== "all") {
-        filtered = filtered.filter((movie) => movie.genre_ids.includes(this.selectedGenre));
+        filtered = filtered.filter((movie) =>
+          movie.genre_ids.includes(this.selectedGenre)
+        );
       }
       return filtered.filter((movie) =>
         movie.title.toLowerCase().includes(this.searchText.toLowerCase())
@@ -326,7 +443,10 @@ export default {
     },
     paginatedMovies() {
       const startIndex = (this.currentPage - 1) * this.itemsPerPage;
-      return this.filteredMovies.slice(startIndex, startIndex + this.itemsPerPage);
+      return this.filteredMovies.slice(
+        startIndex,
+        startIndex + this.itemsPerPage
+      );
     },
   },
 };

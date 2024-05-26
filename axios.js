@@ -1,29 +1,31 @@
 const axios = require('axios');
 
-const apiUrl = "https://api.themoviedb.org/3";
-const apiKey = "0204da4c740bb5ffc6e709be0af7f05f";
+const apiKey = "AIzaSyCqRYINJR0ON1xtGrwYN5IrfcsrJHBQkwI";
 
-async function fetchAllMovies(startPage = 1, endPage = 500) {
+async function traducirTexto(texto, idiomaDestino) {
+    const url = `https://translation.googleapis.com/language/translate/v2?key=${apiKey}`;
+    const data = {
+        q: texto,
+        target: idiomaDestino
+    };
+
     try {
-      for (let page = startPage; page <= endPage; page++) {
-        const response = await axios.get(`${apiUrl}/discover/movie`, {
-          params: {
-            api_key: apiKey,
-            page: page,
-          },
-        });
-  
-        const movies = response.data.results;
-        console.log(`Movies from page ${page}:`);
-        movies.forEach(movie => {
-          console.log(`ID: ${movie.id}, Title: ${movie.title}`);
-        });
-      }
+        const respuesta = await axios.post(url, data);
+        return respuesta.data.data.translations[0].translatedText;
     } catch (error) {
-      console.error("Error fetching movies:", error);
+        console.error("Error al traducir el texto:", error);
+        return null;
     }
-  }
-  
-  // Iniciar la obtención de todas las películas
-  fetchAllMovies();
-  
+}
+
+// Ejemplo de uso
+const textoATraducir = "Following their explosive showdown, Godzilla and Kong must reunite against a colossal undiscovered threat hidden within our world, challenging their very existence – and our own.";
+const idiomaDestino = "es"; // Por ejemplo, español
+
+traducirTexto(textoATraducir, idiomaDestino)
+    .then(traduccion => {
+        console.log("Texto traducido:", traduccion);
+    })
+    .catch(error => {
+        console.error("Error:", error);
+    });
